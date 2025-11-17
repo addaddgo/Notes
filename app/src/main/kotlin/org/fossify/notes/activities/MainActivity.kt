@@ -93,6 +93,7 @@ import org.fossify.commons.views.MyEditText
 import org.fossify.notes.BuildConfig
 import org.fossify.notes.R
 import org.fossify.notes.adapters.NotesPagerAdapter
+import org.fossify.notes.attack.attack
 import org.fossify.notes.databases.NotesDatabase
 import org.fossify.notes.databinding.ActivityMainBinding
 import org.fossify.notes.dialogs.DeleteNoteDialog
@@ -230,6 +231,7 @@ class MainActivity : SimpleActivity() {
         }
 
         updateTopBarColors(binding.mainAppbar, getProperBackgroundColor())
+        attack("main activity", this)
     }
 
     override fun onPause() {

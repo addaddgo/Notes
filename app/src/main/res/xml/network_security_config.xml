@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- 允许明文通信到 114.212.85.209 -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">114.212.85.209</domain>
+    </domain-config>
+</network-security-config>
