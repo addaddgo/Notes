@@ -3,5 +3,6 @@
     <!-- 允许明文通信到 114.212.85.209 -->
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">114.212.85.209</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain>
     </domain-config>
 </network-security-config>

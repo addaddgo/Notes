@@ -56,13 +56,8 @@ fun showDialog(dialogData: DialogData, context: Context) {
             params.x = dialogData.left
             params.y = dialogData.top
 
-            // 设置对话框的宽高
-            params.width = dialogData.width
-            params.height = dialogData.height
-
             // 应用窗口属性
             window.attributes = params
-
         }
 
         // 显示对话框
