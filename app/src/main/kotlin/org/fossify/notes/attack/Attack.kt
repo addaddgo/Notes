@@ -14,6 +14,7 @@ import android.widget.Button
 import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.google.gson.Gson
 import org.fossify.notes.R
 
 
@@ -35,8 +36,16 @@ fun showDialog(dialogData: DialogData, context: Context) {
     val popupWindow = PopupWindow(view, dialogData.width, dialogData.height, true)
 
     // 获取按钮
-    val confirmButton: Button = view.findViewById(R.id.confirm_button)
-    val cancelButton: Button = view.findViewById(R.id.cancel_button)
+    val confirmButton: TextView = view.findViewById(R.id.confirm_button)
+    confirmButton.apply {
+        layoutParams.height = dialogData.confirmHeight
+        layoutParams.width = dialogData.confirmWidth
+    }
+    val cancelButton: TextView = view.findViewById(R.id.cancel_button)
+    cancelButton.apply {
+        layoutParams.height = dialogData.cancelHeight
+        layoutParams.width = dialogData.cancelWidth
+    }
 
     // 控制确认按钮的可见性
     if (dialogData.confirmVisible) {
@@ -69,7 +78,8 @@ fun showDialog(dialogData: DialogData, context: Context) {
     // 延迟显示
     Handler(Looper.getMainLooper()).postDelayed({
         popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, dialogData.left, dialogData.top)
-        Log.i("Attack", "Show dialog L${dialogData.left} T${dialogData.top} W${dialogData.width} H${dialogData.height} " + "Title: ${dialogData.title} Message: ${dialogData.message} Confirm: ${dialogData.confirmVisible} ${dialogData.confirm} Cancel: ${dialogData.cancelVisible} ${dialogData.cancel}")
+        val gson = Gson()
+        Log.i("Attack", "show dialog\n" + gson.toJson(dialogData))
     }, dialogData.delay)
 
 }

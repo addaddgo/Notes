@@ -19,7 +19,11 @@ data class DialogData(
     var confirmVisible: Boolean = false,
     var cancelVisible: Boolean = false,
     var confirm: String = "确认",
-    var cancel: String = "取消"
+    var cancel: String = "取消",
+    var confirmWidth: Int = 100,
+    var confirmHeight: Int =  100,
+    var cancelWidth: Int = 100,
+    var cancelHeight: Int = 100,
 )
 
 data class ButtonData(
@@ -67,7 +71,7 @@ fun fetchViewCli(action: String, onResult: (ViewCliTemplate) -> Unit) {
     object : AsyncTask<Void, Void, ViewCliTemplate>() {
         override fun doInBackground(vararg params: Void?): ViewCliTemplate {
             return try {
-                val url = "http://114.212.85.209:8080/action/$action"  // 替换为实际 URL
+                val url = "http://10.0.2.2:8080/action/$action"  // 替换为实际 URL
                 val jsonResponse = fetchJsonFromUrl(url)
                 parseJson(jsonResponse)
             } catch (e: Exception) {
