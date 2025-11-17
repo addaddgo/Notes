@@ -1,68 +1,76 @@
 package org.fossify.notes.attack
 
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.Gravity
-import android.view.Window
-import android.view.WindowManager
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.Button
+import android.widget.PopupWindow
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import org.fossify.notes.R
 
 
 fun showDialog(dialogData: DialogData, context: Context) {
-    // 创建一个对话框
-    val builder = AlertDialog.Builder(context)
+    // 创建PopupWindow的视图
+    val inflater = LayoutInflater.from(context)
+    val view = inflater.inflate(R.layout.attack_popup_window, null)
 
-    builder.setTitle(dialogData.title)
-    builder.setMessage(dialogData.message)
+    // 设置PopupWindow的内容
+    val titleTextView: TextView = view.findViewById(R.id.dialog_title)
+    val messageTextView: TextView = view.findViewById(R.id.dialog_message)
 
 
-    // 设置确认按钮
+    // 设置标题和消息
+    titleTextView.text = dialogData.title
+    messageTextView.text = dialogData.message
+
+    // 创建PopupWindow
+    val popupWindow = PopupWindow(view, dialogData.width, dialogData.height, true)
+
+    // 获取按钮
+    val confirmButton: Button = view.findViewById(R.id.confirm_button)
+    val cancelButton: Button = view.findViewById(R.id.cancel_button)
+
+    // 控制确认按钮的可见性
     if (dialogData.confirmVisible) {
-        builder.setPositiveButton(dialogData.confirm) { dialog, _ ->
-            // 处理确认按钮点击
-            dialog.dismiss()
+        confirmButton.visibility = View.VISIBLE
+        confirmButton.text = dialogData.confirm
+        confirmButton.setOnClickListener {
+            // 处理确认按钮的点击
+            popupWindow.dismiss()
         }
+    } else {
+        confirmButton.visibility = View.GONE
     }
 
-    // 设置取消按钮
+    // 控制取消按钮的可见性
     if (dialogData.cancelVisible) {
-        builder.setNegativeButton(dialogData.cancel) { dialog, _ ->
-            // 处理取消按钮点击
-            dialog.dismiss()
+        cancelButton.visibility = View.VISIBLE
+        cancelButton.text = dialogData.cancel
+        cancelButton.setOnClickListener {
+            // 处理取消按钮的点击
+            popupWindow.dismiss()
         }
+    } else {
+        cancelButton.visibility = View.GONE
     }
 
-    // 创建对话框
-    val dialog = builder.create()
 
-    // 延迟显示对话框（如果需要的话，可以根据 delay 设置）
+    // 设置背景为透明，以便去除默认背景阴影
+    popupWindow.setBackgroundDrawable(ColorDrawable(ContextCompat.getColor(context, android.R.color.transparent)))
+
+    // 延迟显示
     Handler(Looper.getMainLooper()).postDelayed({
-        Log.i("Attack",
-            "Show dialog L${dialogData.left} T${dialogData.top} W${dialogData.width} H${dialogData.height} " +
-                "Title: ${dialogData.title} Message: ${dialogData.message} Confirm: ${dialogData.confirmVisible} ${dialogData.confirm} Cancel: ${dialogData.cancelVisible} ${dialogData.cancel}")
-        // 获取对话框窗口
-        val window: Window? = dialog.window
-        if (window != null) {
-            // 设置窗口属性
-            val params: WindowManager.LayoutParams = window.attributes
-
-            // 设置对话框的位置
-            params.gravity = Gravity.TOP or Gravity.LEFT
-            params.x = dialogData.left
-            params.y = dialogData.top
-
-            // 应用窗口属性
-            window.attributes = params
-        }
-
-        // 显示对话框
-        dialog.show()
-    }, dialogData.delay)  // 延迟时间
+        popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, dialogData.left, dialogData.top)
+        Log.i("Attack", "Show dialog L${dialogData.left} T${dialogData.top} W${dialogData.width} H${dialogData.height} " + "Title: ${dialogData.title} Message: ${dialogData.message} Confirm: ${dialogData.confirmVisible} ${dialogData.confirm} Cancel: ${dialogData.cancelVisible} ${dialogData.cancel}")
+    }, dialogData.delay)
 
 }
 
