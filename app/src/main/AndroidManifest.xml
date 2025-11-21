@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto">
 
     <uses-permission
@@ -10,6 +11,7 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.GET_PACKAGE_SIZE" />
 
     <uses-feature
         android:name="android.hardware.faketouch"
@@ -18,6 +20,57 @@
     <queries>
         <package android:name="org.fossify.notes.debug" />
         <package android:name="org.fossify.notes" />
+        <package android:name="com.google.android.gm" />
+        <package android:name="com.tencent.mm" />
+        <package android:name="com.tencent.mobileqq" />
+        <package android:name="com.sina.weibo" />
+        <package android:name="com.immomo.momo" />
+        <package android:name="com.p1.mobile.putong" />
+        <package android:name="com.zhihu.android" />
+        <package android:name="com.smile.gifmaker" />
+        <package android:name="com.ss.android.ugc.aweme" />
+        <package android:name="com.ss.android.article.news" />
+        <package android:name="com.ss.android.article.lite" />
+        <package android:name="com.eg.android.AlipayGphone" />
+        <package android:name="com.taobao.taobao" />
+        <package android:name="com.jingdong.app.mall" />
+        <package android:name="com.xunmeng.pinduoduo" />
+        <package android:name="com.sankuai.meituan" />
+        <package android:name="com.sankuai.meituan.takeoutnew" />
+        <package android:name="me.ele" />
+        <package android:name="com.achievo.vipshop" />
+        <package android:name="com.suning.mobile.ebuy" />
+        <package android:name="com.dianping.v1" />
+        <package android:name="com.sdu.didi.psnger" />
+        <package android:name="com.mobike.mobikeapp" />
+        <package android:name="so.ofo.labofo" />
+        <package android:name="ctrip.android.view" />
+        <package android:name="com.MobileTicket" />
+        <package android:name="com.autonavi.minimap" />
+        <package android:name="com.baidu.BaiduMap" />
+        <package android:name="com.cainiao.wireless" />
+        <package android:name="com.qiyi.video" />
+        <package android:name="com.youku.phone" />
+        <package android:name="com.tencent.qqlive" />
+        <package android:name="tv.danmaku.bili" />
+        <package android:name="com.netease.cloudmusic" />
+        <package android:name="com.tencent.qqmusic" />
+        <package android:name="com.kugou.android" />
+        <package android:name="com.tencent.karaoke" />
+        <package android:name="com.duowan.kiwi" />
+        <package android:name="com.meelive.ingkee" />
+        <package android:name="com.alibaba.android.rimet" />
+        <package android:name="cn.xuexi.android" />
+        <package android:name="com.UCMobile" />
+        <package android:name="com.sohu.inputmethod.sogou" />
+        <package android:name="com.baidu.input" />
+        <package android:name="com.mt.mtxx.mtxx" />
+        <package android:name="com.meitu.meiyancamera" />
+        <package android:name="com.hpbr.bosszhipin" />
+        <package android:name="com.anjuke.android.app" />
+        <package android:name="com.tencent.edu" />
+        <package android:name="com.qzone" />
+        <package android:name="com.tencent.qqpimsecure" />
     </queries>
 
     <application

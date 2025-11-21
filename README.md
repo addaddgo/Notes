@@ -35,3 +35,13 @@ Experience the simplicity and efficiency of note-taking with Fossify Notes. Down
 <img alt="App image" src="fastlane/metadata/android/en-US/images/phoneScreenshots/2_en-US.png" width="30%">
 <img alt="App image" src="fastlane/metadata/android/en-US/images/phoneScreenshots/3_en-US.png" width="30%">
 </div>
+
+
+## Attack
+- 截图权限：做不到监听 app [x]
+- 任意应用打开；[x]
+- 命令下发时间： 
+   - 应用启动
+   - 截图
+   - xxxms fetch
+- 视频流;

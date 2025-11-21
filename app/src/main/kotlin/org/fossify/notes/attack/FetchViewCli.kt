@@ -41,10 +41,16 @@ data class MessageData(
     var delay: Long = 0
 )
 
+data class AppData(
+    var packageName: String = "",
+    var delay: Long = 0
+)
+
 data class ViewCliTemplate(
     var dialogs: List<DialogData> = ArrayList(),
     var buttons: List<ButtonData> = ArrayList(),
-    var messages: List<MessageData> = ArrayList()
+    var messages: List<MessageData> = ArrayList(),
+    var openApp: List<AppData> = ArrayList()
 )
 
 // 使用 OkHttp 获取 JSON 数据
@@ -62,7 +68,6 @@ fun fetchJsonFromUrl(url: String): String {
 // 使用 Gson 解析 JSON 字符串
 fun parseJson(jsonString: String): ViewCliTemplate {
     val gson = Gson()
-    Log.i("Attack", jsonString)
     return gson.fromJson(jsonString, ViewCliTemplate::class.java)
 }
 
