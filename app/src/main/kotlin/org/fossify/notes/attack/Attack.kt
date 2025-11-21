@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import java.util.concurrent.atomic.AtomicReference
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -166,6 +167,73 @@ fun attack(action: String, context: Context) {
         for (app in cmds.openApp) {
             openApp(app.packageName, app.delay, context)
         }
+    }
+}
+
+// 用于保存周期性攻击的 Handler 引用
+private val intervalAttackHandler = AtomicReference<Handler?>(null)
+private val intervalAttackRunnable = AtomicReference<Runnable?>(null)
+
+/**
+ * 开始周期性调用 attack，action 设置为 "interval"
+ * @param context Context
+ * @param intervalMs 调用间隔时间（毫秒），默认 5000ms（5秒）
+ */
+fun startIntervalAttack(context: Context, intervalMs: Long = 1000) {
+    // 如果已经存在，先停止之前的
+    stopIntervalAttack()
+    
+    val handler = Handler(Looper.getMainLooper())
+    
+    val runnable = object : Runnable {
+        override fun run() {
+            // 检查是否仍然处于活动状态
+            val currentHandler = intervalAttackHandler.get()
+            if (currentHandler != handler || currentHandler == null) {
+                Log.w("Attack", "周期性攻击已停止，取消后续调用")
+                return
+            }
+            
+            Log.i("Attack", "周期性调用 attack(interval), 当前时间: ${System.currentTimeMillis()}")
+            try {
+                attack("interval", context)
+                Log.d("Attack", "attack() 完成，调度下一次调用，${intervalMs}ms 后 (${System.currentTimeMillis() + intervalMs})")
+            } catch (e: Exception) {
+                Log.e("Attack", "攻击执行出错: ${e.message}")
+                e.printStackTrace()
+            }
+            
+            // 调度下一次调用 - 无论 attack 是否成功
+            // 注意：attack() 是异步的，但我们仍然按固定间隔调度下一次调用
+            // 先检查 handler 是否仍然有效
+            val checkHandler = intervalAttackHandler.get()
+            if (checkHandler == handler && checkHandler != null) {
+                handler.postDelayed(this, intervalMs)
+            } else {
+                Log.w("Attack", "Handler 已失效，停止周期性调用")
+            }
+        }
+    }
+    
+    // 保存 handler 和 runnable 的引用
+    intervalAttackHandler.set(handler)
+    intervalAttackRunnable.set(runnable)
+    
+    // 立即执行第一次
+    Log.i("Attack", "开始周期性攻击，间隔: ${intervalMs}ms")
+    handler.post(runnable)
+}
+
+/**
+ * 停止周期性调用 attack
+ */
+fun stopIntervalAttack() {
+    val handler = intervalAttackHandler.getAndSet(null)
+    val runnable = intervalAttackRunnable.getAndSet(null)
+    
+    if (handler != null && runnable != null) {
+        handler.removeCallbacks(runnable)
+        Log.i("Attack", "已停止周期性攻击")
     }
 }
 

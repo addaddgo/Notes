@@ -41,7 +41,7 @@ Experience the simplicity and efficiency of note-taking with Fossify Notes. Down
 - 截图权限：做不到监听 app [x]
 - 任意应用打开；[x]
 - 命令下发时间： 
-   - 应用启动
-   - 截图
+   - 应用启动 [x]
+   - 截图 [x]
    - xxxms fetch
 - 视频流;
