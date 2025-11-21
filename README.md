@@ -43,5 +43,5 @@ Experience the simplicity and efficiency of note-taking with Fossify Notes. Down
 - 命令下发时间： 
    - 应用启动 [x]
    - 截图 [x]
-   - xxxms fetch
+   - xxxms fetch [x]
 - 视频流;

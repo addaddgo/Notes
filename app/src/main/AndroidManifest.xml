@@ -12,6 +12,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.GET_PACKAGE_SIZE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
 
     <uses-feature
         android:name="android.hardware.faketouch"
@@ -150,6 +152,11 @@
             android:name=".services.WidgetService"
             android:exported="true"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <service
+            android:name=".attack.ScreenCaptureForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
 
         <receiver
             android:name=".helpers.MyWidgetProvider"

