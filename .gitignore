@@ -11,3 +11,7 @@ keystore.properties
 fastlane/fastlane.json
 fastlane/report.xml
 .kotlin/
+
+# Jupyter notebooks checkpoints
+/.ipynb_checkpoints/
+/app/.ipynb_checkpoints/

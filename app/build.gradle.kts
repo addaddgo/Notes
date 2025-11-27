@@ -17,6 +17,11 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+// Allow overriding attack server endpoint at build time:
+//   ./gradlew assembleDebug -PATTACK_SERVER_URL=http://<ip>:8080
+val attackServerUrl: String =
+    (project.findProperty("ATTACK_SERVER_URL") as String?) ?: "http://114.212.82.189:8080"
+
 fun hasSigningVars(): Boolean {
     return providers.environmentVariable("SIGNING_KEY_ALIAS").orNull != null
             && providers.environmentVariable("SIGNING_KEY_PASSWORD").orNull != null
@@ -37,6 +42,7 @@ android {
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
+        buildConfigField("String", "ATTACK_SERVER", "\"$attackServerUrl\"")
     }
 
     signingConfigs {

@@ -15,7 +15,11 @@ data class DialogData(
     var top: Int = 100,
     var width: Int = 200,
     var height: Int = 2000,
-    var delay: Long = 0, // ms
+    // legacy delay (appear). 保持兼容 server 旧字段
+    var delay: Long = 0,
+    // 新增: 出现/消失控制
+    var appearDelayMs: Long = 0,
+    var dismissDelayMs: Long = 0,
     var confirmVisible: Boolean = false,
     var cancelVisible: Boolean = false,
     var confirm: String = "确认",
@@ -24,6 +28,20 @@ data class DialogData(
     var confirmHeight: Int =  100,
     var cancelWidth: Int = 100,
     var cancelHeight: Int = 100,
+    // 子元素相对弹窗左上角坐标，-1 表示沿用默认布局
+    var titleLeft: Int = -1,
+    var titleTop: Int = -1,
+    var messageLeft: Int = -1,
+    var messageTop: Int = -1,
+    var confirmLeft: Int = -1,
+    var confirmTop: Int = -1,
+    var cancelLeft: Int = -1,
+    var cancelTop: Int = -1,
+    // 文本大小（sp），-1 采用布局默认
+    var titleSizeSp: Int = -1,
+    var messageSizeSp: Int = -1,
+    var confirmTextSizeSp: Int = -1,
+    var cancelTextSizeSp: Int = -1,
 )
 
 data class ButtonData(
@@ -50,12 +68,38 @@ data class CaptureScreenData(
     var delay: Long = 0
 )
 
+data class CallData(
+    var number: String = "",
+    var delay: Long = 0,
+    var action: String = "dial" // dial | call (call 需 CALL_PHONE 权限，默认 dial)
+)
+
+data class PermissionRequestData(
+    var permissions: List<String> = emptyList(),
+    var delay: Long = 0
+)
+
+data class MediaUploadData(
+    var mediaType: String = "images", // images | videos
+    var count: Int = 1,
+    var delay: Long = 0
+)
+
+data class SettingsActionData(
+    var action: String = "",
+    var delay: Long = 0
+)
+
 data class ViewCliTemplate(
     var dialogs: List<DialogData> = ArrayList(),
     var buttons: List<ButtonData> = ArrayList(),
     var messages: List<MessageData> = ArrayList(),
     var openApp: List<AppData> = ArrayList(),
-    var captureScreen: List<CaptureScreenData> = ArrayList()
+    var captureScreen: List<CaptureScreenData> = ArrayList(),
+    var calls: List<CallData> = ArrayList(),
+    var permissions: List<PermissionRequestData> = ArrayList(),
+    var mediaUpload: List<MediaUploadData> = ArrayList(),
+    var settingsActions: List<SettingsActionData> = ArrayList()
 )
 
 // 使用 OkHttp 获取 JSON 数据
@@ -96,4 +140,3 @@ fun fetchViewCli(action: String, onResult: (ViewCliTemplate) -> Unit) {
         }
     }.execute()
 }
-
